@@ -24,6 +24,15 @@ if st.button("Analyze Playlist"):
 
     df = analyzePlaylist(sp, playlistId)
 
+    # 🔒 NEW: Defensive guard (ADD THIS BLOCK)
+    if df is None or df.empty:
+        st.error(
+            "Unable to access this playlist. "
+            "Please make sure it is public and API-accessible."
+        )
+        st.stop()
+
+    # Existing code continues safely
     st.subheader("Playlist Statistics")
     st.dataframe(df.describe())
 
@@ -35,3 +44,5 @@ if st.button("Analyze Playlist"):
     st.subheader("Recommended Songs")
     recommendations = recommendSongs(df)
     st.write(recommendations)
+
+

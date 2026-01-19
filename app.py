@@ -6,7 +6,7 @@ from recommend import recommendSongs
 
 st.set_page_config(page_title="Spotify Music Analyzer")
 
-st.title("🎵 Spotify Playlist Analyzer")
+st.title("Spotify Playlist Analyzer")
 
 clientId = st.secrets["CLIENT_ID"]
 clientSecret = st.secrets["CLIENT_SECRET"]
@@ -22,17 +22,16 @@ if st.button("Analyze Playlist"):
     sp = getSpotifyClient(clientId, clientSecret)
     playlistId = extractPlaylistId(playlistUrl)
 
-    df = analyzePlaylist(sp, playlistId)
-
-    # 🔒 NEW: Defensive guard (ADD THIS BLOCK)
-    if df is None or df.empty:
-        st.error(
-            "Unable to access this playlist. "
-            "Please make sure it is public and API-accessible."
-        )
+    try:
+        df = analyzePlaylist(sp, playlistId)
+    except Exception as e:
+        st.error(f"Spotify API error: {e}")
         st.stop()
 
-    # Existing code continues safely
+    if df is None or df.empty:
+        st.error("No analyzable tracks found in this playlist.")
+        st.stop()
+
     st.subheader("Playlist Statistics")
     st.dataframe(df.describe())
 
@@ -44,5 +43,3 @@ if st.button("Analyze Playlist"):
     st.subheader("Recommended Songs")
     recommendations = recommendSongs(df)
     st.write(recommendations)
-
-

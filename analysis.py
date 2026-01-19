@@ -2,20 +2,20 @@ import pandas as pd
 
 
 def analyzePlaylist(sp, playlistId):
-    try:
-        results = sp.playlist_items(playlistId, limit=100)
-        tracks = results["items"]
+    tracks = sp.playlist_items(playlistId)["items"]
+    features = []
 
-        trackIds = [
-            item["track"]["id"]
-            for item in tracks
-            if item["track"] is not None
-        ]
+    for item in tracks:
+        track = item.get("track")
+        if not track or not track.get("id"):
+            continue
 
-        features = sp.audio_features(trackIds)
-        return pd.DataFrame(features)[
-            ["tempo", "energy", "danceability", "valence"]
-        ]
+        audio = sp.audio_features([track["id"]])[0]
+        if audio:
+            features.append(audio)
 
-    except Exception:
+    if not features:
         return None
+
+    df = pd.DataFrame(features)
+    return df

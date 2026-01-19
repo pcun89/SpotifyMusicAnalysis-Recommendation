@@ -7,6 +7,4 @@ def getSpotifyClient(clientId, clientSecret):
         client_id=clientId,
         client_secret=clientSecret
     )
-
-    sp = spotipy.Spotify(auth_manager=authManager)
-    return sp
+    return spotipy.Spotify(auth_manager=authManager)

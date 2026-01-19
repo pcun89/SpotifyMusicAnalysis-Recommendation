@@ -5,3 +5,7 @@ __pycache__/
 
 # Streamlit
 .streamlit/
+
+.venv/
+__pycache__/
+.streamlit/secrets.toml

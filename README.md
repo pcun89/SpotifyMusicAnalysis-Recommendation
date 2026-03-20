@@ -1,4 +1,3 @@
-# SpotifyMusicAnalysis-Recommendation
 # 🎵 Spotify Music Analysis & Recommendation Tool
 
 This project analyzes Spotify playlists by treating music as data.

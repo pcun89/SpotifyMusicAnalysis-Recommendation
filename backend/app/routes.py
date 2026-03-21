@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
-from services.spotify_client import getSpotifyClient
-from services.analysis import analyzePlaylist
-from services.recommend import recommendSongs
+from app.services.spotify_client import getSpotifyClient
+from app.services.analysis import analyzePlaylist
+from app.services.recommend import recommendSongs
 import os
 
 router = APIRouter()

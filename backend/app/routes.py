@@ -6,8 +6,8 @@ import os
 
 router = APIRouter()
 
-CLIENT_ID = os.getenv("CLIENT_ID")
-CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+CLIENT_ID = os.getenv("f4668a783537463a91ce19997d7ab964")
+CLIENT_SECRET = os.getenv("db8a8deb26a647098bbd022041221d0d")
 
 
 def extractPlaylistId(url: str) -> str:
@@ -23,13 +23,13 @@ def analyze(playlistUrl: str):
         sp = getSpotifyClient(CLIENT_ID, CLIENT_SECRET)
         playlistId = extractPlaylistId(playlistUrl)
 
-        df = analyzePlaylist(sp, playlistId)
+        df, metadata = analyzePlaylist(sp, playlistId)
 
         if df is None or df.empty:
             raise HTTPException(status_code=400, detail="No tracks found")
 
         stats = df.describe().to_dict()
-        recommendations = recommendSongs(df)
+        recommendations = recommendSongs(df, metadata)
 
         return {
             "stats": stats,

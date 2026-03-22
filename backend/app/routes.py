@@ -2,12 +2,11 @@ from fastapi import APIRouter, HTTPException
 from app.services.spotify_client import getSpotifyClient
 from app.services.analysis import analyzePlaylist
 from app.services.recommend import recommendSongs
-import os
 
 router = APIRouter()
 
-CLIENT_ID = os.getenv("f4668a783537463a91ce19997d7ab964")
-CLIENT_SECRET = os.getenv("db8a8deb26a647098bbd022041221d0d")
+clientId = "f4668a783537463a91ce19997d7ab964"
+clientSecret = "db8a8deb26a647098bbd022041221d0d"
 
 
 def extractPlaylistId(url: str) -> str:
@@ -17,10 +16,11 @@ def extractPlaylistId(url: str) -> str:
 @router.get("/analyze")
 def analyze(playlistUrl: str):
     try:
-        if not CLIENT_ID or not CLIENT_SECRET:
-            raise HTTPException(status_code=500, detail="Missing Spotify credentials")
+        if not clientId or not clientSecret:
+            raise HTTPException(
+                status_code=500, detail="Missing Spotify credentials")
 
-        sp = getSpotifyClient(CLIENT_ID, CLIENT_SECRET)
+        sp = getSpotifyClient(clientId, clientSecret)
         playlistId = extractPlaylistId(playlistUrl)
 
         df, metadata = analyzePlaylist(sp, playlistId)

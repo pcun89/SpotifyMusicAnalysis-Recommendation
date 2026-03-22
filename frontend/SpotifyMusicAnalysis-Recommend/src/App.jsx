@@ -1,121 +1,159 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState } from "react";
+import { analyzePlaylist } from "./api";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [url, setUrl] = useState("");
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleAnalyze = async () => {
+    if (!url) {
+      setError("Please enter a playlist URL");
+      return;
+    }
+
+    setLoading(true);
+    setData(null);
+    setError("");
+
+    try {
+      const result = await analyzePlaylist(url);
+      setData(result);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to analyze playlist. Check backend.");
+    }
+
+    setLoading(false);
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
+    <div style={styles.container}>
+      <h1 style={styles.title}>🎵 Spotify Analyzer</h1>
+
+      <div style={styles.inputContainer}>
+        <input
+          style={styles.input}
+          placeholder="Paste Spotify Playlist URL..."
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+        />
+
+        <button style={styles.button} onClick={handleAnalyze}>
+          Analyze
         </button>
-      </section>
+      </div>
 
-      <div className="ticks"></div>
+      {error && <p style={styles.error}>{error}</p>}
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      {loading && <p style={styles.loading}>Analyzing playlist...</p>}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      {data && (
+        <>
+          <h2 style={styles.section}>🎧 Recommendations</h2>
+
+          <div style={styles.grid}>
+            {data.recommendations.map((rec, index) => (
+              <div key={index} style={styles.card}>
+                {rec.image && (
+                  <img
+                    src={rec.image}
+                    alt="album cover"
+                    style={styles.image}
+                  />
+                )}
+
+                <p style={styles.song}>{rec.track}</p>
+                <p style={styles.artist}>{rec.artist}</p>
+
+                <p style={styles.score}>
+                  Score: {rec.score.toFixed(3)}
+                </p>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
 }
 
-export default App
+const styles = {
+  container: {
+    backgroundColor: "#121212",
+    minHeight: "100vh",
+    color: "white",
+    padding: "30px",
+    fontFamily: "Arial, sans-serif"
+  },
+  title: {
+    textAlign: "center",
+    color: "#1DB954",
+    marginBottom: "30px"
+  },
+  inputContainer: {
+    display: "flex",
+    justifyContent: "center",
+    marginBottom: "20px"
+  },
+  input: {
+    width: "400px",
+    padding: "12px",
+    borderRadius: "6px",
+    border: "none",
+    marginRight: "10px",
+    outline: "none"
+  },
+  button: {
+    backgroundColor: "#1DB954",
+    color: "white",
+    border: "none",
+    padding: "12px 16px",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontWeight: "bold"
+  },
+  error: {
+    textAlign: "center",
+    color: "red"
+  },
+  loading: {
+    textAlign: "center",
+    color: "#b3b3b3"
+  },
+  section: {
+    marginTop: "30px"
+  },
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
+    gap: "20px",
+    marginTop: "20px"
+  },
+  card: {
+    backgroundColor: "#181818",
+    padding: "15px",
+    borderRadius: "12px",
+    transition: "transform 0.2s ease",
+    cursor: "pointer"
+  },
+  image: {
+    width: "100%",
+    borderRadius: "8px",
+    marginBottom: "10px"
+  },
+  song: {
+    fontWeight: "bold",
+    fontSize: "14px"
+  },
+  artist: {
+    color: "#b3b3b3",
+    fontSize: "13px"
+  },
+  score: {
+    marginTop: "8px",
+    color: "#1DB954",
+    fontSize: "12px"
+  }
+};

@@ -2,7 +2,8 @@ import pandas as pd
 
 
 def analyzePlaylist(sp, playlistId):
-    tracks = sp.playlist_items(playlistId)["items"]
+    playlist = sp.playlist(playlistId)   # ✅ safer endpoint
+    tracks = playlist["tracks"]["items"]
 
     features = []
     metadata = []
@@ -20,7 +21,9 @@ def analyzePlaylist(sp, playlistId):
 
             metadata.append({
                 "name": track["name"],
-                "artist": track["artists"][0]["name"]
+                "artist": track["artists"][0]["name"],
+                "image": track["album"]["images"][0]["url"]
+                if track["album"]["images"] else None
             })
 
     if not features:

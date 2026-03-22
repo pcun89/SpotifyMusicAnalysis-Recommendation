@@ -13,6 +13,7 @@ def recommendSongs(df, metadata, index=0, topN=5):
         results.append({
             "track": metadata[i]["name"],
             "artist": metadata[i]["artist"],
+            "image": metadata[i]["image"],
             "score": float(score)
         })
 

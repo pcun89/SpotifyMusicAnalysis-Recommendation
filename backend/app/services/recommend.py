@@ -1,9 +1,9 @@
 from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
 
 
 def recommendSongs(df, metadata, index=0, topN=5):
     similarity = cosine_similarity(df)
-
     scores = list(enumerate(similarity[index]))
     scores = sorted(scores, key=lambda x: x[1], reverse=True)
 
@@ -11,7 +11,7 @@ def recommendSongs(df, metadata, index=0, topN=5):
 
     for i, score in scores[1:topN + 1]:
         results.append({
-            "track": metadata[i]["name"],
+            "name": metadata[i]["name"],
             "artist": metadata[i]["artist"],
             "image": metadata[i]["image"],
             "score": float(score)

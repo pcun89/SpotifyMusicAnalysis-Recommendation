@@ -9,7 +9,7 @@ export default function App() {
 
   const handleAnalyze = async () => {
     if (!url) {
-      setError("Please enter a playlist URL");
+      setError("Enter a playlist URL");
       return;
     }
 
@@ -21,21 +21,22 @@ export default function App() {
       const result = await analyzePlaylist(url);
       setData(result);
     } catch (err) {
-      console.error(err);
-      setError("Failed to analyze playlist. Check backend.");
+      setError("Failed to analyze playlist");
     }
 
     setLoading(false);
   };
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>🎵 Spotify Analyzer</h1>
+    <div style={styles.app}>
+      <div style={styles.header}>
+        <h1 style={styles.logo}>Spotify Analyzer</h1>
+      </div>
 
-      <div style={styles.inputContainer}>
+      <div style={styles.searchBox}>
         <input
           style={styles.input}
-          placeholder="Paste Spotify Playlist URL..."
+          placeholder="Paste Spotify Playlist..."
           value={url}
           onChange={(e) => setUrl(e.target.value)}
         />
@@ -46,114 +47,116 @@ export default function App() {
       </div>
 
       {error && <p style={styles.error}>{error}</p>}
-
-      {loading && <p style={styles.loading}>Analyzing playlist...</p>}
+      {loading && <p style={styles.loading}>Analyzing...</p>}
 
       {data && (
-        <>
-          <h2 style={styles.section}>🎧 Recommendations</h2>
+        <div style={styles.results}>
+          <h2>Recommended Tracks</h2>
 
           <div style={styles.grid}>
-            {data.recommendations.map((rec, index) => (
-              <div key={index} style={styles.card}>
-                {rec.image && (
-                  <img
-                    src={rec.image}
-                    alt="album cover"
-                    style={styles.image}
-                  />
-                )}
+            {data.recommendations.map((rec, i) => (
+              <div key={i} style={styles.card}>
+                <img src={rec.image} style={styles.image} />
 
-                <p style={styles.song}>{rec.track}</p>
-                <p style={styles.artist}>{rec.artist}</p>
-
-                <p style={styles.score}>
-                  Score: {rec.score.toFixed(3)}
-                </p>
+                <div style={styles.cardContent}>
+                  <p style={styles.track}>{rec.name}</p>
+                  <p style={styles.artist}>{rec.artist}</p>
+                </div>
               </div>
             ))}
           </div>
-        </>
+        </div>
       )}
     </div>
   );
 }
 
 const styles = {
-  container: {
-    backgroundColor: "#121212",
+  app: {
+    background: "linear-gradient(to bottom, #121212, #000)",
     minHeight: "100vh",
     color: "white",
-    padding: "30px",
-    fontFamily: "Arial, sans-serif"
+    fontFamily: "sans-serif",
+    padding: "20px"
   },
-  title: {
+
+  header: {
     textAlign: "center",
-    color: "#1DB954",
     marginBottom: "30px"
   },
-  inputContainer: {
+
+  logo: {
+    color: "#1DB954",
+    fontSize: "32px"
+  },
+
+  searchBox: {
     display: "flex",
     justifyContent: "center",
+    gap: "10px",
     marginBottom: "20px"
   },
+
   input: {
     width: "400px",
     padding: "12px",
-    borderRadius: "6px",
+    borderRadius: "20px",
     border: "none",
-    marginRight: "10px",
     outline: "none"
   },
+
   button: {
-    backgroundColor: "#1DB954",
-    color: "white",
+    background: "#1DB954",
     border: "none",
-    padding: "12px 16px",
-    borderRadius: "6px",
+    padding: "12px 20px",
+    borderRadius: "20px",
+    color: "white",
+    fontWeight: "bold",
     cursor: "pointer",
+    transition: "0.2s",
+  },
+
+  results: {
+    marginTop: "30px"
+  },
+
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+    gap: "20px"
+  },
+
+  card: {
+    background: "#181818",
+    borderRadius: "12px",
+    overflow: "hidden",
+    transition: "transform 0.3s ease",
+    cursor: "pointer"
+  },
+
+  image: {
+    width: "100%"
+  },
+
+  cardContent: {
+    padding: "10px"
+  },
+
+  track: {
     fontWeight: "bold"
   },
+
+  artist: {
+    color: "#b3b3b3"
+  },
+
   error: {
     textAlign: "center",
     color: "red"
   },
+
   loading: {
     textAlign: "center",
-    color: "#b3b3b3"
-  },
-  section: {
-    marginTop: "30px"
-  },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
-    gap: "20px",
-    marginTop: "20px"
-  },
-  card: {
-    backgroundColor: "#181818",
-    padding: "15px",
-    borderRadius: "12px",
-    transition: "transform 0.2s ease",
-    cursor: "pointer"
-  },
-  image: {
-    width: "100%",
-    borderRadius: "8px",
-    marginBottom: "10px"
-  },
-  song: {
-    fontWeight: "bold",
-    fontSize: "14px"
-  },
-  artist: {
-    color: "#b3b3b3",
-    fontSize: "13px"
-  },
-  score: {
-    marginTop: "8px",
-    color: "#1DB954",
-    fontSize: "12px"
+    color: "#aaa"
   }
 };

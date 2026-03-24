@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { analyzePlaylist } from "./api";
+import { motion } from "framer-motion";
 
 export default function App() {
   const [url, setUrl] = useState("");
@@ -41,18 +42,15 @@ export default function App() {
           onChange={(e) => setUrl(e.target.value)}
         />
 
-        <button
+        {/* 🔥 Motion Button */}
+        <motion.button
           style={styles.button}
           onClick={handleAnalyze}
-          onMouseEnter={(e) => {
-            e.target.style.transform = "scale(1.1)";
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.transform = "scale(1)";
-          }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
         >
           Analyze
-        </button>
+        </motion.button>
       </div>
 
       {error && <p style={styles.error}>{error}</p>}
@@ -64,16 +62,20 @@ export default function App() {
 
           <div style={styles.grid}>
             {data.recommendations.map((rec, i) => (
-              <div
+              /* 🔥 Motion Card */
+              <motion.div
                 key={i}
                 style={styles.card}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "scale(1.05)";
-                  e.currentTarget.style.boxShadow = "0 10px 25px rgba(0,0,0,0.6)";
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  delay: i * 0.08,
+                  duration: 0.4,
+                  ease: "easeOut"
                 }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "scale(1)";
-                  e.currentTarget.style.boxShadow = "none";
+                whileHover={{
+                  scale: 1.08,
+                  boxShadow: "0 15px 30px rgba(0,0,0,0.7)"
                 }}
               >
                 <img src={rec.image} style={styles.image} />
@@ -82,7 +84,7 @@ export default function App() {
                   <p style={styles.track}>{rec.name}</p>
                   <p style={styles.artist}>{rec.artist}</p>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -132,8 +134,7 @@ const styles = {
     borderRadius: "20px",
     color: "white",
     fontWeight: "bold",
-    cursor: "pointer",
-    transition: "all 0.2s ease"
+    cursor: "pointer"
   },
 
   results: {
@@ -150,12 +151,13 @@ const styles = {
     background: "#181818",
     borderRadius: "12px",
     overflow: "hidden",
-    transition: "all 0.3s ease",
     cursor: "pointer"
   },
 
   image: {
-    width: "100%"
+    width: "100%",
+    height: "200px",
+    objectFit: "cover"
   },
 
   cardContent: {
@@ -163,11 +165,13 @@ const styles = {
   },
 
   track: {
-    fontWeight: "bold"
+    fontWeight: "bold",
+    fontSize: "14px"
   },
 
   artist: {
-    color: "#b3b3b3"
+    color: "#b3b3b3",
+    fontSize: "13px"
   },
 
   error: {

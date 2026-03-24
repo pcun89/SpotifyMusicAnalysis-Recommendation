@@ -41,7 +41,16 @@ export default function App() {
           onChange={(e) => setUrl(e.target.value)}
         />
 
-        <button style={styles.button} onClick={handleAnalyze}>
+        <button
+          style={styles.button}
+          onClick={handleAnalyze}
+          onMouseEnter={(e) => {
+            e.target.style.transform = "scale(1.1)";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.transform = "scale(1)";
+          }}
+        >
           Analyze
         </button>
       </div>
@@ -55,7 +64,18 @@ export default function App() {
 
           <div style={styles.grid}>
             {data.recommendations.map((rec, i) => (
-              <div key={i} style={styles.card}>
+              <div
+                key={i}
+                style={styles.card}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "scale(1.05)";
+                  e.currentTarget.style.boxShadow = "0 10px 25px rgba(0,0,0,0.6)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "scale(1)";
+                  e.currentTarget.style.boxShadow = "none";
+                }}
+              >
                 <img src={rec.image} style={styles.image} />
 
                 <div style={styles.cardContent}>
@@ -113,7 +133,7 @@ const styles = {
     color: "white",
     fontWeight: "bold",
     cursor: "pointer",
-    transition: "0.2s",
+    transition: "all 0.2s ease"
   },
 
   results: {
@@ -130,7 +150,7 @@ const styles = {
     background: "#181818",
     borderRadius: "12px",
     overflow: "hidden",
-    transition: "transform 0.3s ease",
+    transition: "all 0.3s ease",
     cursor: "pointer"
   },
 

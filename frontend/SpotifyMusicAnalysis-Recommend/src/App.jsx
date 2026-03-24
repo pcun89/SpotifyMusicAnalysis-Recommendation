@@ -5,87 +5,91 @@ import { motion } from "framer-motion";
 export default function App() {
   const [url, setUrl] = useState("");
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [currentTrack, setCurrentTrack] = useState(null);
 
   const handleAnalyze = async () => {
-    if (!url) {
-      setError("Enter a playlist URL");
-      return;
-    }
+    if (!url) return;
 
-    setLoading(true);
-    setData(null);
-    setError("");
-
-    try {
-      const result = await analyzePlaylist(url);
-      setData(result);
-    } catch (err) {
-      setError("Failed to analyze playlist");
-    }
-
-    setLoading(false);
+    const result = await analyzePlaylist(url);
+    setData(result);
   };
 
   return (
-    <div style={styles.app}>
-      <div style={styles.header}>
-        <h1 style={styles.logo}>Spotify Analyzer</h1>
+    <div style={styles.layout}>
+
+      {/* 🔥 SIDEBAR */}
+      <div style={styles.sidebar}>
+        <h2 style={styles.sidebarLogo}>Spotify</h2>
+        <p style={styles.navItem}>Home</p>
+        <p style={styles.navItem}>Search</p>
+        <p style={styles.navItem}>Your Library</p>
       </div>
 
-      <div style={styles.searchBox}>
-        <input
-          style={styles.input}
-          placeholder="Paste Spotify Playlist..."
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-        />
+      {/* 🔥 MAIN CONTENT */}
+      <div style={styles.main}>
 
-        {/* 🔥 Motion Button */}
-        <motion.button
-          style={styles.button}
-          onClick={handleAnalyze}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          Analyze
-        </motion.button>
-      </div>
+        {/* 🌈 GRADIENT HEADER */}
+        <div style={styles.header}>
+          <h1>Playlist Analyzer</h1>
 
-      {error && <p style={styles.error}>{error}</p>}
-      {loading && <p style={styles.loading}>Analyzing...</p>}
+          <div style={styles.searchBox}>
+            <input
+              style={styles.input}
+              placeholder="Paste playlist..."
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+            />
 
-      {data && (
-        <div style={styles.results}>
-          <h2>Recommended Tracks</h2>
+            <motion.button
+              style={styles.button}
+              onClick={handleAnalyze}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Analyze
+            </motion.button>
+          </div>
+        </div>
 
-          <div style={styles.grid}>
-            {data.recommendations.map((rec, i) => (
-              /* 🔥 Motion Card */
+        {/* 🎧 TRACK GRID */}
+        <div style={styles.grid}>
+          {data &&
+            data.recommendations.map((rec, i) => (
               <motion.div
                 key={i}
                 style={styles.card}
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  delay: i * 0.08,
-                  duration: 0.4,
-                  ease: "easeOut"
-                }}
-                whileHover={{
-                  scale: 1.08,
-                  boxShadow: "0 15px 30px rgba(0,0,0,0.7)"
-                }}
+                transition={{ delay: i * 0.05 }}
+                whileHover={{ scale: 1.05 }}
               >
-                <img src={rec.image} style={styles.image} />
+                <div style={styles.imageWrapper}>
+                  <img src={rec.image} style={styles.image} />
 
-                <div style={styles.cardContent}>
-                  <p style={styles.track}>{rec.name}</p>
-                  <p style={styles.artist}>{rec.artist}</p>
+                  {/* ▶️ PLAY BUTTON */}
+                  <motion.div
+                    style={styles.playButton}
+                    whileHover={{ scale: 1.2 }}
+                    onClick={() => setCurrentTrack(rec)}
+                  >
+                    ▶
+                  </motion.div>
                 </div>
+
+                <p style={styles.track}>{rec.name}</p>
+                <p style={styles.artist}>{rec.artist}</p>
               </motion.div>
             ))}
+        </div>
+      </div>
+
+      {/* 🎵 STICKY PLAYER */}
+      {currentTrack && (
+        <div style={styles.player}>
+          <img src={currentTrack.image} style={styles.playerImg} />
+          <div>
+            <p>{currentTrack.name}</p>
+            <p style={{ color: "#b3b3b3" }}>{currentTrack.artist}</p>
           </div>
         </div>
       )}
@@ -94,93 +98,123 @@ export default function App() {
 }
 
 const styles = {
-  app: {
-    background: "linear-gradient(to bottom, #121212, #000)",
-    minHeight: "100vh",
+  layout: {
+    display: "flex",
+    height: "100vh",
+    background: "#000",
     color: "white",
-    fontFamily: "sans-serif",
+    fontFamily: "sans-serif"
+  },
+
+  sidebar: {
+    width: "200px",
+    background: "#000",
     padding: "20px"
   },
 
-  header: {
-    textAlign: "center",
-    marginBottom: "30px"
+  sidebarLogo: {
+    color: "#1DB954"
   },
 
-  logo: {
-    color: "#1DB954",
-    fontSize: "32px"
+  navItem: {
+    marginTop: "20px",
+    cursor: "pointer",
+    color: "#b3b3b3"
+  },
+
+  main: {
+    flex: 1,
+    overflowY: "auto"
+  },
+
+  header: {
+    padding: "30px",
+    background: "linear-gradient(to bottom, #1DB954, #121212)"
   },
 
   searchBox: {
     display: "flex",
-    justifyContent: "center",
     gap: "10px",
-    marginBottom: "20px"
+    marginTop: "10px"
   },
 
   input: {
-    width: "400px",
-    padding: "12px",
+    padding: "10px",
     borderRadius: "20px",
     border: "none",
-    outline: "none"
+    width: "300px"
   },
 
   button: {
     background: "#1DB954",
     border: "none",
-    padding: "12px 20px",
+    padding: "10px 20px",
     borderRadius: "20px",
     color: "white",
-    fontWeight: "bold",
     cursor: "pointer"
   },
 
-  results: {
-    marginTop: "30px"
-  },
-
   grid: {
+    padding: "20px",
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
     gap: "20px"
   },
 
   card: {
     background: "#181818",
-    borderRadius: "12px",
-    overflow: "hidden",
-    cursor: "pointer"
+    padding: "10px",
+    borderRadius: "10px",
+    position: "relative"
+  },
+
+  imageWrapper: {
+    position: "relative"
   },
 
   image: {
     width: "100%",
-    height: "200px",
-    objectFit: "cover"
+    borderRadius: "8px"
   },
 
-  cardContent: {
-    padding: "10px"
+  playButton: {
+    position: "absolute",
+    bottom: "10px",
+    right: "10px",
+    background: "#1DB954",
+    width: "40px",
+    height: "40px",
+    borderRadius: "50%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    opacity: 0.9,
+    cursor: "pointer"
   },
 
   track: {
-    fontWeight: "bold",
-    fontSize: "14px"
+    marginTop: "10px",
+    fontWeight: "bold"
   },
 
   artist: {
     color: "#b3b3b3",
-    fontSize: "13px"
+    fontSize: "14px"
   },
 
-  error: {
-    textAlign: "center",
-    color: "red"
+  player: {
+    position: "fixed",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    background: "#181818",
+    padding: "10px",
+    display: "flex",
+    alignItems: "center",
+    gap: "10px"
   },
 
-  loading: {
-    textAlign: "center",
-    color: "#aaa"
+  playerImg: {
+    width: "50px"
   }
 };

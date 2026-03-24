@@ -62,15 +62,26 @@ export default function App() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
                 whileHover={{ scale: 1.05 }}
+                onClick={(e) => {
+                  e.preventDefault();       // 🚫 stop redirect
+                  setCurrentTrack(rec);     // 🎵 update player
+                }}
               >
                 <div style={styles.imageWrapper}>
-                  <img src={rec.image} style={styles.image} />
+                  <img
+                    src={rec.image}
+                    style={styles.image}
+                    alt="album"
+                  />
 
                   {/* ▶️ PLAY BUTTON */}
                   <motion.div
                     style={styles.playButton}
                     whileHover={{ scale: 1.2 }}
-                    onClick={() => setCurrentTrack(rec)}
+                    onClick={(e) => {
+                      e.stopPropagation();  // 🚫 prevent double trigger
+                      setCurrentTrack(rec);
+                    }}
                   >
                     ▶
                   </motion.div>
